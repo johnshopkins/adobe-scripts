@@ -83,7 +83,11 @@ var Exporter = (function () {
     var master = {
         packDirectory: "All Packs"
     }; 
+
+    return {
     
+    };
+
 })();
 
 var doc = app.activeDocument;
