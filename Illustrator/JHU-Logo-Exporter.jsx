@@ -82,10 +82,17 @@ var Exporter = (function () {
     // master options object
     var master = {
         packDirectory: "All Packs"
-    }; 
+    };
 
     return {
-    
+        init: function (document, options) {
+            doc = document;
+            master = _.extend(master, options);
+            absPath = doc.path.fsName + "/" + master.packDirectory;
+            allPacks = new Folder(absPath);
+
+            allPacks.create();
+        }
     };
 
 })();
