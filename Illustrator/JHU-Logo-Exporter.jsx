@@ -54,6 +54,16 @@ var _ = (function () {
                     }
                 }
             }
+        },
+        extend: function(obj) {
+            this.each(Array.prototype.slice.call(arguments, 1), function(source) {
+                if (source) {
+                    for (var prop in source) {
+                        obj[prop] = source[prop];
+                    }
+                }
+            });
+            return obj;
         }
     };
 })();
@@ -171,19 +181,11 @@ function saveEPS( file, artboardNumber, filename ) {
 
 function hideLayers(layers)
 {
-	forEach(layers, function(layer) {  
+	_.each(layers, function(layer) {  
 		layer.visible = false;
 	});
 }
 
-function forEach(collection, fn)
-{
-	var n = collection.length;
-	for(var i=0; i<n; ++i)
-	{
-		fn(collection[i]);
-	}
-}
 
 var processAttributes = function (item) {
 	return item.toLowerCase().trim().replace(" ", "-");
