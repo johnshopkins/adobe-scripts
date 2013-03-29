@@ -199,7 +199,22 @@ var doc = app.activeDocument;
 var scalingFactor = 500;
 
 // go through each artboard
-(function () {
+(function (app) {
+
+    var doc = app.activeDocument;
+    var i;
+    var j;
+    var currentArtboard;
+    var currentLayer;
+    var attributes;
+    var artboard;
+    var layer;
+    var fpath;
+
+    Exporter.init(doc, {
+        scalingFactor: 500
+    });
+
 	for(var i=0; i<doc.artboards.length; i++) {
 		
 		var currentArtboard = doc.artboards[i];
@@ -264,4 +279,5 @@ var scalingFactor = 500;
 			}
 		}
 	}
-})();
+    
+})(app);
