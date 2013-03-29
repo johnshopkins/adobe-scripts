@@ -92,37 +92,27 @@ var Exporter = (function () {
             allPacks = new Folder(absPath);
 
             allPacks.create();
+        },
+        packSetup: function (name) {
+            var pack = allPacks.insert(name);
+            var small = pack.insert("small");
+            var large = pack.insert("large");
+
+            small.insert("EPS");
+            small.insert("PDF");
+            small.insert("JPG");
+            small.insert("PNG");
+
+            large.insert("EPS");
+            large.insert("PDF");
+            large.insert("JPG");
+            large.insert("PNG");
         }
     };
 
 })();
 
 var doc = app.activeDocument;
-
-// var savePath = Folder.selectDialog("Choose the folder where these packs will be saved.");
-var absPath = doc.path.fsName;
-
-var allPacks = doc.path.insert("All Packs");
-
-var packSetup = (function (parent) {
-	
-	return function (name) {
-		var pack = parent.insert(name);
-		var small = pack.insert("small");
-		var large = pack.insert("large");
-
-		small.insert("EPS");
-		small.insert("PDF");
-		small.insert("JPG");
-		small.insert("PNG");
-
-		large.insert("EPS");
-		large.insert("PDF");
-		large.insert("JPG");
-		large.insert("PNG");
-	};
-
-})(allPacks);
 
 var resetAllPacksPath = function (division, sizeFormat) {
 	var path = new Folder(absPath);
