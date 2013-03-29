@@ -114,6 +114,11 @@ var Exporter = (function () {
 
             return path;
         },
+        artboardLayerMatch: function (artboard, layer) {
+            return artboard.division === layer.division &&
+                   artboard.sizeFormat === layer.sizeFormat &&
+                   artboard.orientation === layer.orientation;
+        },
         hideLayers: function (layers) {
             _.each(layers, function (layer) {
                 layer.visible = false;
@@ -234,7 +239,7 @@ var scalingFactor = 500;
 			};
 			var fpath;
 
-			if( artboard.division === layer.division && artboard.sizeFormat === layer.sizeFormat && artboard.orientation === layer.orientation) {
+			if (Exporter.artboardLayerMatch()) {
 
 				hideLayers(doc.layers);
 				currentLayer.visible = true;
