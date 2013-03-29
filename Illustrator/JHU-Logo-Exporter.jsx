@@ -75,7 +75,15 @@ var _ = (function () {
  */
 
 var Exporter = (function () {
-
+    var doc;
+    var absPath;
+    var allPacks;
+    
+    // master options object
+    var master = {
+        packDirectory: "All Packs"
+    }; 
+    
 })();
 
 var doc = app.activeDocument;
