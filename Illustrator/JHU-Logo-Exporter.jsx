@@ -82,7 +82,7 @@ var Exporter = (function () {
     // master options object
     var master = {
         packDirectory: "All Packs"
-    };
+    }; 
 
     return {
         init: function (document, options) {
@@ -189,16 +189,12 @@ var Exporter = (function () {
 
             file.changePath('EPS/' + filename + '.eps');
             doc.saveAs(file, options);
-        }}
+        }
     };
 
 })();
 
-var doc = app.activeDocument;
 
-var scalingFactor = 500;
-
-// go through each artboard
 (function (app) {
 
     var doc = app.activeDocument;
@@ -215,7 +211,7 @@ var scalingFactor = 500;
         scalingFactor: 500
     });
 
-	// Loop through each artboard
+    // Loop through each artboard
     for(i = 0; i < doc.artboards.length; i++) {
 
         currentArtboard = doc.artboards[i];
@@ -266,3 +262,5 @@ var scalingFactor = 500;
     doc.close();
 
 })(app);
+
+
