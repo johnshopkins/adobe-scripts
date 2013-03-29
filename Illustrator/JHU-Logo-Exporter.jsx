@@ -31,6 +31,34 @@ String.prototype.trim = function () {
 };
 
 
+/**
+ * Custom utility underscore object,
+ * select methods pulled from underscore.js
+ */
+var _ = (function () {
+    var breaker = {};
+
+    return {
+        each: function(obj, iterator, context) {
+            if (obj == null) return;
+            else if (obj.length === +obj.length) {
+                for (var i = 0, l = obj.length; i < l; i++) {
+                    // alert("i is " + i);
+                    // alert(obj);
+                    if (iterator.call(context, obj[i], i, obj) === breaker) return;
+                }
+            } else {
+                for (var key in obj) {
+                    if (_.has(obj, key)) {
+                        if (iterator.call(context, obj[key], key, obj) === breaker) return;
+                    }
+                }
+            }
+        }
+    };
+})();
+
+
 var doc = app.activeDocument;
 
 // var savePath = Folder.selectDialog("Choose the folder where these packs will be saved.");
