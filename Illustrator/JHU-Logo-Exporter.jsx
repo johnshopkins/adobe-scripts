@@ -215,69 +215,52 @@ var scalingFactor = 500;
         scalingFactor: 500
     });
 
-	for(var i=0; i<doc.artboards.length; i++) {
-		
-		var currentArtboard = doc.artboards[i];
-		var artboardAttributes = currentArtboard.name.split(":").map(processAttributes);
+	// Loop through each artboard
+    for(i = 0; i < doc.artboards.length; i++) {
 
-		var artboard = {
-			name: currentArtboard.name,
-			division: artboardAttributes[0],
-			sizeFormat: artboardAttributes[1],
-			orientation: artboardAttributes[2]
-		};
+        currentArtboard = doc.artboards[i];
+        attributes = currentArtboard.name.split(":").map(Exporter.processAttributes);
 
-		// confirm("This is artboard index " + i + ", called " + artboard.name);
+        artboard = {
+            index: i,
+            number: i + 1,
+            name: currentArtboard.name,
+            division: attributes[0],
+            sizeFormat: attributes[1],
+            orientation: attributes[2]
+        };
 
-		// if (!confirm(artboard.division)) { exit(); }
+        Exporter.packSetup(artboard.division);
+        doc.artboards.setActiveArtboardIndex(artboard.index);
 
-		packSetup(artboard.division);
-		doc.artboards.setActiveArtboardIndex(i);
+        // Loop through each layer
+        for(j = 0; j < doc.layers.length; j++) {
 
-		// go through each layer
-		for(var j=0; j<doc.layers.length; j++) {
-			var currentLayer = doc.layers[j];
-			var layerAttributes = currentLayer.name.split(".").map(processAttributes);
+            currentLayer = doc.layers[j];
+            attributes = currentLayer.name.split(".").map(Exporter.processAttributes);
 
-			// alert("new layer");
-			// alert(artboardAttributes);
-			// alert(layerAttributes);
+            layer = {
+                index: j,
+                name: currentLayer.name,
+                division: attributes[0],
+                sizeFormat: attributes[1],
+                orientation: attributes[2],
+                color: attributes[3]
+            };
 
-			// confirm("Continue?");
+            if (Exporter.artboardLayerMatch(artboard, layer)) {
 
-			var layer = {
-				name: currentLayer.name,
-				division: layerAttributes[0],
-				sizeFormat: layerAttributes[1],
-				orientation: layerAttributes[2],
-				color: layerAttributes[3]
-			};
-			var fpath;
+                Exporter.hideLayers(doc.layers);
+                currentLayer.visible = true;
 
-			if (Exporter.artboardLayerMatch()) {
+                fpath = Exporter.resetAllPacksPath([artboard.division, layer.sizeFormat]);
 
-				hideLayers(doc.layers);
-				currentLayer.visible = true;
+                Exporter.savePNG(fpath, layer.name);
+                Exporter.saveJPG(fpath, layer.name);
+                Exporter.savePDF(fpath, artboard.number, layer.name);
+                Exporter.saveEPS(fpath, artboard.number, layer.name);
+            }
+        }
+    }
 
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				savePNG(fpath, layer.name);
-
-				// alert('Saving ' + layer.name + '.png to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				saveJPG(fpath, layer.name);
-
-				// alert('Saving ' + layer.name + '.jpg to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				savePDF(fpath, i + 1, layer.name);
-
-				// alert('Saving ' + layer.name + '.pdf to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				saveEPS(fpath, i + 1, layer.name);
-			}
-		}
-	}
-    
 })(app);
