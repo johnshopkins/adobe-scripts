@@ -1,242 +1,266 @@
 /*
-* Description: An Adobe Illustrator script that export each layer as a separate PNG image file
-* Usage: Layer name is the PNG file name. Rename layers if necessary.
-* This is an early version that has not been sufficiently tested. Use at your own risks.
-* License: GNU General Public License Version 3. (http://www.gnu.org/licenses/gpl-3.0-standalone.html)
+* Description: 
+* 
+* An Adobe Illustrator CS6 script to auto export files
+* first by artboard and then by name-matched layer.
 *
-* Copyright (c) 2009. William Ngan.
-* http://www.metaphorical.net
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
-
-var doc = app.activeDocument;
-
-// var savePath = Folder.selectDialog("Choose the folder where these packs will be saved.");
-var absPath = doc.path.fsName;
-
+/**
+ * Adobe JS Polyfills 
+ * 
+ * Could be moved to a separate file if we could figure
+ * out how to include other script files
+ */
 Folder.prototype.insert = function (name) {
-	var folder = new Folder(this.fsName + "/" + name);
-	folder.create();
-	return folder;
+    var folder = new Folder(this.fsName + "/" + name);
+    folder.create();
+    return folder;
 };
-
-var allPacks = doc.path.insert("All Packs");
-
-var packSetup = (function (parent) {
-	
-	return function (name) {
-		var pack = parent.insert(name);
-		var small = pack.insert("small");
-		var large = pack.insert("large");
-
-		small.insert("EPS");
-		small.insert("PDF");
-		small.insert("JPG");
-		small.insert("PNG");
-
-		large.insert("EPS");
-		large.insert("PDF");
-		large.insert("JPG");
-		large.insert("PNG");
-	};
-
-})(allPacks);
-
-var resetAllPacksPath = function (division, sizeFormat) {
-	var path = new Folder(absPath);
-	// alert(path.fsName);
-	path.changePath('All Packs/' + division + '/' + sizeFormat + '/');
-	// confirm(path.fsName);
-	return path;
-};
-
-var scalingFactor = 500;
-
-function savePNG(file, filename) {
-	// export SAVE-FOR-WEB options
-	var options = new ExportOptionsPNG24();
-	// var folder = new Folder(file.fsName);
-
-	options.transparency = true;
-	options.artBoardClipping = true;
-	options.antiAliasing = true;
-	options.matte = false;
-	options.horizontalScale = scalingFactor;
-	options.verticalScale = scalingFactor;
-
-	// export as SAVE-FOR-WEB
-	file.changePath('PNG/' + filename + '.png');
-	doc.exportFile(file, ExportType.PNG24, options);
-
-}
-
-function saveJPG(file, filename) {
-	// export SAVE-FOR-WEB options
-	var JPGMatte = new RGBColor();
-		JPGMatte.red = 255;
-		JPGMatte.green = 255;
-		JPGMatte.blue = 255;
-
-	var options = new ExportOptionsJPEG();
-	
-	options.artBoardClipping = true;
-	options.antiAliasing = true;
-	options.matte = true;
-	options.matteColor = JPGMatte;
-	options.horizontalScale = scalingFactor;
-	options.verticalScale = scalingFactor;
-	options.qualitySetting = 100;
-
-	// export as SAVE-FOR-WEB
-	file.changePath('JPG/' + filename + '.jpg');
-	doc.exportFile(file, ExportType.JPEG, options);
-
-}
-
-function savePDF( file, artboardNumber, filename ) {
-	// save as PDF options
-	var options = new PDFSaveOptions();
-
-	options.compatibility = PDFCompatibility.ACROBAT6;
-	options.generateThumbnails = false;
-	options.preserveEditability = false;
-	options.acrobatLayers = false;
-	options.artboardRange = artboardNumber;
-	options.colorDownsampling = 0;
-
-	// save as PDF
-	file.changePath('PDF/' + filename + '.pdf');
-	doc.saveAs(file, options);
-}
-
-function saveEPS( file, artboardNumber, filename ) {
-	// save as EPS options
-	var options = new EPSSaveOptions();
-
-	options.compatibility = Compatibility.ILLUSTRATOR16;
-	options.artboardRange = artboardNumber;
-	options.embedLinkedFiles = true;
-	options.embedAllFonts = true;
-	options.includeDocumentThumbnails = false;
-	options.saveMultipleArtboards = false;
-
-	// save as EPS
-	file.changePath('EPS/' + filename + '.eps');
-	doc.saveAs(file, options);
-}
-
-function hideLayers(layers)
-{
-	forEach(layers, function(layer) {  
-		layer.visible = false;
-	});
-}
-
-function forEach(collection, fn)
-{
-	var n = collection.length;
-	for(var i=0; i<n; ++i)
-	{
-		fn(collection[i]);
-	}
-}
 
 Array.prototype.map = function (callback) {
-	var newList = [];
-	for (i=0; i<this.length; i++) {
-		newList.push(callback(this[i]));
-	}
-	return newList;
+    var newList = [];
+    for (i=0; i<this.length; i++) {
+        newList.push(callback(this[i]));
+    }
+    return newList;
 };
 
 String.prototype.trim = function () {
-	return this.replace(/^\s+|\s+$/g, '');
-}
-
-var processAttributes = function (item) {
-	return item.toLowerCase().trim().replace(" ", "-");
+    return this.replace(/^\s+|\s+$/g, '');
 };
 
-// alert(doc.artboards);
 
-// go through each artboard
-(function () {
-	for(var i=0; i<doc.artboards.length; i++) {
-		
-		var currentArtboard = doc.artboards[i];
-		var artboardAttributes = currentArtboard.name.split(":").map(processAttributes);
+/**
+ * Custom utility underscore object,
+ * select methods pulled from underscore.js
+ */
+var _ = (function () {
+    var breaker = {};
 
-		var artboard = {
-			name: currentArtboard.name,
-			division: artboardAttributes[0],
-			sizeFormat: artboardAttributes[1],
-			orientation: artboardAttributes[2]
-		};
-
-		// confirm("This is artboard index " + i + ", called " + artboard.name);
-
-		// if (!confirm(artboard.division)) { exit(); }
-
-		packSetup(artboard.division);
-		doc.artboards.setActiveArtboardIndex(i);
-
-		// go through each layer
-		for(var j=0; j<doc.layers.length; j++) {
-			var currentLayer = doc.layers[j];
-			var layerAttributes = currentLayer.name.split(".").map(processAttributes);
-
-			// alert("new layer");
-			// alert(artboardAttributes);
-			// alert(layerAttributes);
-
-			// confirm("Continue?");
-
-			var layer = {
-				name: currentLayer.name,
-				division: layerAttributes[0],
-				sizeFormat: layerAttributes[1],
-				orientation: layerAttributes[2],
-				color: layerAttributes[3]
-			};
-			var fpath;
-
-			if( artboard.division === layer.division && artboard.sizeFormat === layer.sizeFormat && artboard.orientation === layer.orientation) {
-
-				hideLayers(doc.layers);
-				currentLayer.visible = true;
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				savePNG(fpath, layer.name);
-
-				// alert('Saving ' + layer.name + '.png to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				saveJPG(fpath, layer.name);
-
-				// alert('Saving ' + layer.name + '.jpg to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				savePDF(fpath, i + 1, layer.name);
-
-				// alert('Saving ' + layer.name + '.pdf to ' + fpath.fsName);
-
-				fpath = resetAllPacksPath(artboard.division, layer.sizeFormat);
-				saveEPS(fpath, i + 1, layer.name);
-			}
-		}
-	}
+    return {
+        each: function(obj, iterator, context) {
+            if (obj == null) return;
+            else if (obj.length === +obj.length) {
+                for (var i = 0, l = obj.length; i < l; i++) {
+                    // alert("i is " + i);
+                    // alert(obj);
+                    if (iterator.call(context, obj[i], i, obj) === breaker) return;
+                }
+            } else {
+                for (var key in obj) {
+                    if (_.has(obj, key)) {
+                        if (iterator.call(context, obj[key], key, obj) === breaker) return;
+                    }
+                }
+            }
+        },
+        extend: function(obj) {
+            this.each(Array.prototype.slice.call(arguments, 1), function(source) {
+                if (source) {
+                    for (var prop in source) {
+                        obj[prop] = source[prop];
+                    }
+                }
+            });
+            return obj;
+        }
+    };
 })();
+
+
+/**
+ * Custom Exporter object (where we put
+ * all of our custom export methods)
+ */
+
+var Exporter = (function () {
+    var doc;
+    var absPath;
+    var allPacks;
+    
+    // master options object
+    var master = {
+        packDirectory: "All Packs"
+    }; 
+
+    return {
+        init: function (document, options) {
+            doc = document;
+            master = _.extend(master, options);
+            absPath = doc.path.fsName + "/" + master.packDirectory;
+            allPacks = new Folder(absPath);
+
+            allPacks.create();
+        },
+        packSetup: function (name) {
+            var pack = allPacks.insert(name);
+            var small = pack.insert("small");
+            var large = pack.insert("large");
+
+            small.insert("EPS");
+            small.insert("PDF");
+            small.insert("JPG");
+            small.insert("PNG");
+
+            large.insert("EPS");
+            large.insert("PDF");
+            large.insert("JPG");
+            large.insert("PNG");
+        },
+        resetAllPacksPath: function (directories) {
+            var path = new Folder(absPath);
+            path.changePath(directories.join("/") + "/");
+
+            return path;
+        },
+        artboardLayerMatch: function (artboard, layer) {
+            return artboard.division === layer.division &&
+                   artboard.sizeFormat === layer.sizeFormat &&
+                   artboard.orientation === layer.orientation;
+        },
+        hideLayers: function (layers) {
+            _.each(layers, function (layer) {
+                layer.visible = false;
+            });
+        },
+        processAttributes: function (item) {
+            return item.toLowerCase().trim().replace(" ", "-");
+        },
+        savePNG: function (file, filename) {
+            var options = _.extend(new ExportOptionsPNG24(), {
+                transparency: true,
+                artBoardClipping: true,
+                antiAliasing: true,
+                matte: false,
+                horizontalScale: master.scalingFactor,
+                verticalScale: master.scalingFactor
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('PNG/' + filename + '.png');
+            doc.exportFile(file, ExportType.PNG24, options);
+        },
+        saveJPG: function (file, filename) {
+            var JPGMatte = _.extend(new RGBColor(), {
+                red: 255,
+                green: 255,
+                blue: 255
+            });
+            var options = _.extend(new ExportOptionsJPEG(), {
+                artBoardClipping: true,
+                antiAliasing: true,
+                matte: true,
+                matteColor: JPGMatte,
+                horizontalScale: master.scalingFactor,
+                verticalScale: master.scalingFactor,
+                qualitySetting: 100
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('JPG/' + filename + '.jpg');
+            doc.exportFile(file, ExportType.JPEG, options);
+        },
+        savePDF: function (file, artboardNumber, filename) {
+            var options = _.extend(new PDFSaveOptions(), {
+                acrobatLayers: false,
+                artboardRange: artboardNumber,
+                colorDownsampling: 0,
+                compatibility: PDFCompatibility.ACROBAT6,
+                generateThumbnails: false,
+                preserveEditability: false
+            });
+            var file = new Folder(file.fsName);
+
+            // save as PDF
+            file.changePath('PDF/' + filename + '.pdf');
+            doc.saveAs(file, options);
+        },
+        saveEPS: function (file, artboardNumber, filename) {
+            var options = _.extend(new EPSSaveOptions(), {
+                artboardRange: artboardNumber,
+                compatibility: Compatibility.ILLUSTRATOR16,
+                embedLinkedFiles: true,
+                embedAllFonts: true,
+                includeDocumentThumbnails: false,
+                saveMultipleArtboards: false
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('EPS/' + filename + '.eps');
+            doc.saveAs(file, options);
+        }
+    };
+
+})();
+
+
+(function (app) {
+
+    var doc = app.activeDocument;
+    var i;
+    var j;
+    var currentArtboard;
+    var currentLayer;
+    var attributes;
+    var artboard;
+    var layer;
+    var fpath;
+
+    Exporter.init(doc, {
+        scalingFactor: 500
+    });
+
+    // Loop through each artboard
+    for(i = 0; i < doc.artboards.length; i++) {
+
+        currentArtboard = doc.artboards[i];
+        attributes = currentArtboard.name.split(":").map(Exporter.processAttributes);
+
+        artboard = {
+            index: i,
+            number: i + 1,
+            name: currentArtboard.name,
+            division: attributes[0],
+            sizeFormat: attributes[1],
+            orientation: attributes[2]
+        };
+
+        Exporter.packSetup(artboard.division);
+        doc.artboards.setActiveArtboardIndex(artboard.index);
+
+        // Loop through each layer
+        for(j = 0; j < doc.layers.length; j++) {
+
+            currentLayer = doc.layers[j];
+            attributes = currentLayer.name.split(".").map(Exporter.processAttributes);
+
+            layer = {
+                index: j,
+                name: currentLayer.name,
+                division: attributes[0],
+                sizeFormat: attributes[1],
+                orientation: attributes[2],
+                color: attributes[3]
+            };
+
+            if (Exporter.artboardLayerMatch(artboard, layer)) {
+
+                Exporter.hideLayers(doc.layers);
+                currentLayer.visible = true;
+
+                fpath = Exporter.resetAllPacksPath([artboard.division, layer.sizeFormat]);
+
+                Exporter.savePNG(fpath, layer.name);
+                Exporter.saveJPG(fpath, layer.name);
+                Exporter.savePDF(fpath, artboard.number, layer.name);
+                Exporter.saveEPS(fpath, artboard.number, layer.name);
+            }
+        }
+    }
+
+    doc.close();
+
+})(app);
+
+
