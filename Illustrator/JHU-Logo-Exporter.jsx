@@ -107,103 +107,91 @@ var Exporter = (function () {
             large.insert("PDF");
             large.insert("JPG");
             large.insert("PNG");
-        }
+        },
+        resetAllPacksPath: function (directories) {
+            var path = new Folder(absPath);
+            path.changePath(directories.join("/") + "/");
+
+            return path;
+        },
+        hideLayers: function (layers) {
+            _.each(layers, function (layer) {
+                layer.visible = false;
+            });
+        },
+        processAttributes: function (item) {
+            return item.toLowerCase().trim().replace(" ", "-");
+        },
+        savePNG: function (file, filename) {
+            var options = _.extend(new ExportOptionsPNG24(), {
+                transparency: true,
+                artBoardClipping: true,
+                antiAliasing: true,
+                matte: false,
+                horizontalScale: master.scalingFactor,
+                verticalScale: master.scalingFactor
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('PNG/' + filename + '.png');
+            doc.exportFile(file, ExportType.PNG24, options);
+        },
+        saveJPG: function (file, filename) {
+            var JPGMatte = _.extend(new RGBColor(), {
+                red: 255,
+                green: 255,
+                blue: 255
+            });
+            var options = _.extend(new ExportOptionsJPEG(), {
+                artBoardClipping: true,
+                antiAliasing: true,
+                matte: true,
+                matteColor: JPGMatte,
+                horizontalScale: master.scalingFactor,
+                verticalScale: master.scalingFactor,
+                qualitySetting: 100
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('JPG/' + filename + '.jpg');
+            doc.exportFile(file, ExportType.JPEG, options);
+        },
+        savePDF: function (file, artboardNumber, filename) {
+            var options = _.extend(new PDFSaveOptions(), {
+                acrobatLayers: false,
+                artboardRange: artboardNumber,
+                colorDownsampling: 0,
+                compatibility: PDFCompatibility.ACROBAT6,
+                generateThumbnails: false,
+                preserveEditability: false
+            });
+            var file = new Folder(file.fsName);
+
+            // save as PDF
+            file.changePath('PDF/' + filename + '.pdf');
+            doc.saveAs(file, options);
+        },
+        saveEPS: function (file, artboardNumber, filename) {
+            var options = _.extend(new EPSSaveOptions(), {
+                artboardRange: artboardNumber,
+                compatibility: Compatibility.ILLUSTRATOR16,
+                embedLinkedFiles: true,
+                embedAllFonts: true,
+                includeDocumentThumbnails: false,
+                saveMultipleArtboards: false
+            });
+            var file = new Folder(file.fsName);
+
+            file.changePath('EPS/' + filename + '.eps');
+            doc.saveAs(file, options);
+        }}
     };
 
 })();
 
 var doc = app.activeDocument;
 
-var resetAllPacksPath = function (division, sizeFormat) {
-	var path = new Folder(absPath);
-	// alert(path.fsName);
-	path.changePath('All Packs/' + division + '/' + sizeFormat + '/');
-	// confirm(path.fsName);
-	return path;
-};
-
 var scalingFactor = 500;
-
-function savePNG(file, filename) {
-	var options = _.extend(new ExportOptionsPNG24(), {
-        transparency: true,
-        artBoardClipping: true,
-        antiAliasing: true,
-        matte: false,
-        horizontalScale: master.scalingFactor,
-        verticalScale: master.scalingFactor
-    });
-    var file = new Folder(file.fsName);
-
-    file.changePath('PNG/' + filename + '.png');
-    doc.exportFile(file, ExportType.PNG24, options);
-}
-
-function saveJPG(file, filename) {
-	var JPGMatte = _.extend(new RGBColor(), {
-        red: 255,
-        green: 255,
-        blue: 255
-    });
-    var options = _.extend(new ExportOptionsJPEG(), {
-        artBoardClipping: true,
-        antiAliasing: true,
-        matte: true,
-        matteColor: JPGMatte,
-        horizontalScale: master.scalingFactor,
-        verticalScale: master.scalingFactor,
-        qualitySetting: 100
-    });
-    var file = new Folder(file.fsName);
-
-    file.changePath('JPG/' + filename + '.jpg');
-    doc.exportFile(file, ExportType.JPEG, options);
-}
-
-function savePDF( file, artboardNumber, filename ) {
-	var options = _.extend(new PDFSaveOptions(), {
-        acrobatLayers: false,
-        artboardRange: artboardNumber,
-        colorDownsampling: 0,
-        compatibility: PDFCompatibility.ACROBAT6,
-        generateThumbnails: false,
-        preserveEditability: false
-    });
-    var file = new Folder(file.fsName);
-
-    // save as PDF
-    file.changePath('PDF/' + filename + '.pdf');
-    doc.saveAs(file, options);
-}
-
-function saveEPS( file, artboardNumber, filename ) {
-	var options = _.extend(new EPSSaveOptions(), {
-        artboardRange: artboardNumber,
-        compatibility: Compatibility.ILLUSTRATOR16,
-        embedLinkedFiles: true,
-        embedAllFonts: true,
-        includeDocumentThumbnails: false,
-        saveMultipleArtboards: false
-    });
-    var file = new Folder(file.fsName);
-
-    file.changePath('EPS/' + filename + '.eps');
-    doc.saveAs(file, options);
-}
-
-function hideLayers(layers)
-{
-	_.each(layers, function(layer) {  
-		layer.visible = false;
-	});
-}
-
-
-var processAttributes = function (item) {
-	return item.toLowerCase().trim().replace(" ", "-");
-};
-
-// alert(doc.artboards);
 
 // go through each artboard
 (function () {
