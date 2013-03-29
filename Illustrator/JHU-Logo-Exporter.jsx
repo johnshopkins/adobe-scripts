@@ -263,4 +263,6 @@ var scalingFactor = 500;
         }
     }
 
+    doc.close();
+
 })(app);
