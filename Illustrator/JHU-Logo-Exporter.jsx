@@ -69,6 +69,15 @@ var _ = (function () {
 })();
 
 
+/**
+ * Custom Exporter object (where we put
+ * all of our custom export methods)
+ */
+
+var Exporter = (function () {
+
+})();
+
 var doc = app.activeDocument;
 
 // var savePath = Folder.selectDialog("Choose the folder where these packs will be saved.");
