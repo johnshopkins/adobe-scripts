@@ -107,76 +107,70 @@ var resetAllPacksPath = function (division, sizeFormat) {
 var scalingFactor = 500;
 
 function savePNG(file, filename) {
-	// export SAVE-FOR-WEB options
-	var options = new ExportOptionsPNG24();
-	// var folder = new Folder(file.fsName);
+	var options = _.extend(new ExportOptionsPNG24(), {
+        transparency: true,
+        artBoardClipping: true,
+        antiAliasing: true,
+        matte: false,
+        horizontalScale: master.scalingFactor,
+        verticalScale: master.scalingFactor
+    });
+    var file = new Folder(file.fsName);
 
-	options.transparency = true;
-	options.artBoardClipping = true;
-	options.antiAliasing = true;
-	options.matte = false;
-	options.horizontalScale = scalingFactor;
-	options.verticalScale = scalingFactor;
-
-	// export as SAVE-FOR-WEB
-	file.changePath('PNG/' + filename + '.png');
-	doc.exportFile(file, ExportType.PNG24, options);
-
+    file.changePath('PNG/' + filename + '.png');
+    doc.exportFile(file, ExportType.PNG24, options);
 }
 
 function saveJPG(file, filename) {
-	// export SAVE-FOR-WEB options
-	var JPGMatte = new RGBColor();
-		JPGMatte.red = 255;
-		JPGMatte.green = 255;
-		JPGMatte.blue = 255;
+	var JPGMatte = _.extend(new RGBColor(), {
+        red: 255,
+        green: 255,
+        blue: 255
+    });
+    var options = _.extend(new ExportOptionsJPEG(), {
+        artBoardClipping: true,
+        antiAliasing: true,
+        matte: true,
+        matteColor: JPGMatte,
+        horizontalScale: master.scalingFactor,
+        verticalScale: master.scalingFactor,
+        qualitySetting: 100
+    });
+    var file = new Folder(file.fsName);
 
-	var options = new ExportOptionsJPEG();
-	
-	options.artBoardClipping = true;
-	options.antiAliasing = true;
-	options.matte = true;
-	options.matteColor = JPGMatte;
-	options.horizontalScale = scalingFactor;
-	options.verticalScale = scalingFactor;
-	options.qualitySetting = 100;
-
-	// export as SAVE-FOR-WEB
-	file.changePath('JPG/' + filename + '.jpg');
-	doc.exportFile(file, ExportType.JPEG, options);
-
+    file.changePath('JPG/' + filename + '.jpg');
+    doc.exportFile(file, ExportType.JPEG, options);
 }
 
 function savePDF( file, artboardNumber, filename ) {
-	// save as PDF options
-	var options = new PDFSaveOptions();
+	var options = _.extend(new PDFSaveOptions(), {
+        acrobatLayers: false,
+        artboardRange: artboardNumber,
+        colorDownsampling: 0,
+        compatibility: PDFCompatibility.ACROBAT6,
+        generateThumbnails: false,
+        preserveEditability: false
+    });
+    var file = new Folder(file.fsName);
 
-	options.compatibility = PDFCompatibility.ACROBAT6;
-	options.generateThumbnails = false;
-	options.preserveEditability = false;
-	options.acrobatLayers = false;
-	options.artboardRange = artboardNumber;
-	options.colorDownsampling = 0;
-
-	// save as PDF
-	file.changePath('PDF/' + filename + '.pdf');
-	doc.saveAs(file, options);
+    // save as PDF
+    file.changePath('PDF/' + filename + '.pdf');
+    doc.saveAs(file, options);
 }
 
 function saveEPS( file, artboardNumber, filename ) {
-	// save as EPS options
-	var options = new EPSSaveOptions();
+	var options = _.extend(new EPSSaveOptions(), {
+        artboardRange: artboardNumber,
+        compatibility: Compatibility.ILLUSTRATOR16,
+        embedLinkedFiles: true,
+        embedAllFonts: true,
+        includeDocumentThumbnails: false,
+        saveMultipleArtboards: false
+    });
+    var file = new Folder(file.fsName);
 
-	options.compatibility = Compatibility.ILLUSTRATOR16;
-	options.artboardRange = artboardNumber;
-	options.embedLinkedFiles = true;
-	options.embedAllFonts = true;
-	options.includeDocumentThumbnails = false;
-	options.saveMultipleArtboards = false;
-
-	// save as EPS
-	file.changePath('EPS/' + filename + '.eps');
-	doc.saveAs(file, options);
+    file.changePath('EPS/' + filename + '.eps');
+    doc.saveAs(file, options);
 }
 
 function hideLayers(layers)
