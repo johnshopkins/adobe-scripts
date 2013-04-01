@@ -78,11 +78,11 @@ var Exporter = (function () {
     var doc;
     var absPath;
     var allPacks;
-    
+
     // master options object
     var master = {
         packDirectory: "All Packs"
-    }; 
+    };
 
     return {
         init: function (document, options) {
