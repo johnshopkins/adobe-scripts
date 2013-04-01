@@ -3,15 +3,15 @@
  * all of our custom export methods)
  */
 
-var Exporter = (function () {
+$.global.Exporter = (function () {
     var doc;
     var absPath;
     var allPacks;
-    
+
     // master options object
     var master = {
         packDirectory: "All Packs"
-    }; 
+    };
 
     return {
         init: function (document, options) {
@@ -34,8 +34,6 @@ var Exporter = (function () {
 
             large.insert("EPS");
             large.insert("PDF");
-            large.insert("JPG");
-            large.insert("PNG");
         },
         resetAllPacksPath: function (directories) {
             var path = new Folder(absPath);
