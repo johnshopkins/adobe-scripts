@@ -228,6 +228,14 @@ var Exporter = (function () {
 
         Exporter.packSetup(artboard.division);
         doc.artboards.setActiveArtboardIndex(artboard.index);
+        
+        // Convert all TextFrame objects in the document to outlines
+        while (doc.textFrames.length > 0) {
+            doc.textFrames[0].createOutline();
+        }
+        // Note: createOutline() changes the object and affects the number
+        // of TextFrame objects left, so _.each() failed half way through
+        // each time, so this works better and faster.
 
         // Loop through each layer
         for(j = 0; j < doc.layers.length; j++) {
