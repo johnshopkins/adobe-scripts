@@ -1,10 +1,19 @@
+/**
+ * Libraries.include(path) -- path must be relative to adobe_scripts/lib/
+ * See: https://gist.github.com/jasonrhodes/5286526
+ */
+[].indexOf||(Array.prototype.indexOf=function(a,b,c){for(c=this.length,b=(c+~~b)%c;b<c&&(!(b in this)||this[b]!==a);b++);return b^c?b:-1;});
+var Libraries=function(a){return{include:function(b){return b.match(/\.jsx$/i)||(b+=".jsx"),$.evalFile(a+b)}}}($.fileName.split("/").splice(0,$.fileName.split("/").indexOf("adobe_scripts")+1).join("/") + "/lib/");
+
+
 /*
-* Description: 
+* Name: "JHU-Logo-Exporter.jsx
 * 
-* An Adobe Illustrator CS6 script to auto export files
+* Description: An Adobe Illustrator CS6 script to auto export files
 * first by artboard and then by name-matched layer.
 *
 */
+
 
 /**
  * Adobe JS Polyfills 
@@ -12,61 +21,13 @@
  * Could be moved to a separate file if we could figure
  * out how to include other script files
  */
-Folder.prototype.insert = function (name) {
-    var folder = new Folder(this.fsName + "/" + name);
-    folder.create();
-    return folder;
-};
-
-Array.prototype.map = function (callback) {
-    var newList = [];
-    for (i=0; i<this.length; i++) {
-        newList.push(callback(this[i]));
-    }
-    return newList;
-};
-
-String.prototype.trim = function () {
-    return this.replace(/^\s+|\s+$/g, '');
-};
+Libraries.include("adobe-polyfills");
 
 
 /**
- * Custom utility underscore object,
- * select methods pulled from underscore.js
+ * Underscore.js (the whole thing!)
  */
-var _ = (function () {
-    var breaker = {};
-
-    return {
-        each: function(obj, iterator, context) {
-            if (obj == null) return;
-            else if (obj.length === +obj.length) {
-                for (var i = 0, l = obj.length; i < l; i++) {
-                    // alert("i is " + i);
-                    // alert(obj);
-                    if (iterator.call(context, obj[i], i, obj) === breaker) return;
-                }
-            } else {
-                for (var key in obj) {
-                    if (_.has(obj, key)) {
-                        if (iterator.call(context, obj[key], key, obj) === breaker) return;
-                    }
-                }
-            }
-        },
-        extend: function(obj) {
-            this.each(Array.prototype.slice.call(arguments, 1), function(source) {
-                if (source) {
-                    for (var prop in source) {
-                        obj[prop] = source[prop];
-                    }
-                }
-            });
-            return obj;
-        }
-    };
-})();
+Libraries.include("underscore");
 
 
 /**
@@ -210,6 +171,8 @@ var Exporter = (function () {
     Exporter.init(doc, {
         scalingFactor: 500
     });
+
+    exit();
 
     // Loop through each artboard
     for(i = 0; i < doc.artboards.length; i++) {
