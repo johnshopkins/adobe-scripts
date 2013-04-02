@@ -40,6 +40,8 @@ Libraries.include("Exporter");
 (function (app) {
 
     var doc = app.activeDocument;
+    var count = 0;
+    var timer = {};
     var i;
     var j;
     var currentArtboard;
@@ -48,6 +50,8 @@ Libraries.include("Exporter");
     var artboard;
     var layer;
     var fpath;
+
+    timer.start = (new Date).getTime();
 
     Exporter.init(doc, {
         scalingFactor: 500
@@ -102,14 +106,28 @@ Libraries.include("Exporter");
                 fpath = Exporter.resetAllPacksPath([artboard.division, layer.sizeFormat]);
 
                 Exporter.savePNG(fpath, layer.name);
-                if (layer.color !== "white"){Exporter.saveJPG(fpath, layer.name);};
+                if (layer.color !== "white") { Exporter.saveJPG(fpath, layer.name); }
                 Exporter.savePDF(fpath, artboard.number, layer.name);
                 Exporter.saveEPS(fpath, artboard.number, layer.name);
+
+                // Increment the counter in a superhackalicious way
+                if (layer.color === "white") {
+                    count += layer.sizeFormat === "small" ? 3 : 2;
+                } else {
+                    count += layer.sizeFormat === "small" ? 4 : 2;
+                }
+        
             }
         }
+
     }
 
-    doc.close();
+    timer.end = (new Date).getTime();
+    timer.duration = timer.end - timer.start;
+
+    alert("Congratulations! You created " + count + " logo files in " + timer.duration / 1000 + " seconds!");
+
+    doc.close(SaveOptions.DONOTSAVECHANGES);
 
 })(app);
 
