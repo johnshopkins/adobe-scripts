@@ -1,0 +1,84 @@
+#!/bin/sh
+
+function rename_files {
+    # echo "Renaming $1"
+
+    if [ -d "$1" ]
+    then
+        IFS=$'\n'
+        FILES=$(ls "$1" | tr ";" "\n")
+        for f in $FILES
+        do
+            rename_files "$1/$f"
+        done
+    else 
+        RENAME=$(echo $1 | sed 's/_[^\.]*\.eps$/.eps/')
+        mv "$1" "$RENAME"
+    fi
+}
+
+# $1: old directory name
+# $2: new directory to move into
+function addTo {
+    mkdir -p "$PACKSDIR/$2"
+    mv "$PACKSDIR/$1" "$PACKSDIR/$2"
+}
+
+function combine {
+    # echo "Should we combine $1?"
+
+    case "$1" in
+
+        *"sheridan"*)
+            echo "Yes, combine $1"
+            addTo "$1" "sheridan" ;;
+
+        *"peabody"*)
+            echo "Yes, combine on $1"
+            addTo "$1" "peabody" ;;
+
+        *)
+            echo "Do not combine $1" ;;
+    
+    esac
+
+}
+
+# Default directory for packs
+DIR="~/jhuidentity"
+
+# If a directory was passed as the first arg, use it instead
+if [ $1 ]
+then
+    DIR=$(cd $1; pwd)
+fi
+
+PACKSDIR="$DIR/All Packs"
+
+# If the packs directory doesn't exist, blow up
+if [ ! -d "$PACKSDIR" ]
+then
+    echo "Error finding $PACKSDIR"
+    echo "Did you run the Adobe Illustrator script first?"
+    exit 1;
+fi
+
+# Change into the packs directory for good
+cd "$PACKSDIR"
+
+# Remove existing zip files
+ls | grep zip$ | xargs rm
+
+for p in $(ls)
+do
+    echo "Rename/combine -> $p"
+    rename_files "$PACKSDIR/$p"
+    combine "$p"
+done
+
+for p in $(ls)
+do
+    echo "Zipping up -> $p"
+    zip -r "$p.zip" "$p"
+done
+
