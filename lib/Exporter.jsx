@@ -110,7 +110,7 @@ $.global.Exporter = (function () {
                 embedLinkedFiles: true,
                 embedAllFonts: true,
                 includeDocumentThumbnails: false,
-                saveMultipleArtboards: false
+                saveMultipleArtboards: true
             });
             var file = new Folder(file.fsName);
 
