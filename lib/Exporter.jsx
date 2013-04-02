@@ -66,7 +66,7 @@ $.global.Exporter = (function () {
             var file = new Folder(file.fsName);
 
             file.changePath('PNG/' + filename + '.png');
-            doc.exportFile(file, ExportType.PNG24, options);
+            return doc.exportFile(file, ExportType.PNG24, options);
         },
         saveJPG: function (file, filename) {
             var JPGMatte = _.extend(new RGBColor(), {
@@ -86,7 +86,7 @@ $.global.Exporter = (function () {
             var file = new Folder(file.fsName);
 
             file.changePath('JPG/' + filename + '.jpg');
-            doc.exportFile(file, ExportType.JPEG, options);
+            return doc.exportFile(file, ExportType.JPEG, options);
         },
         savePDF: function (file, artboardNumber, filename) {
             var options = _.extend(new PDFSaveOptions(), {
@@ -101,7 +101,7 @@ $.global.Exporter = (function () {
 
             // save as PDF
             file.changePath('PDF/' + filename + '.pdf');
-            doc.saveAs(file, options);
+            return doc.saveAs(file, options);
         },
         saveEPS: function (file, artboardNumber, filename) {
             var options = _.extend(new EPSSaveOptions(), {
@@ -115,7 +115,7 @@ $.global.Exporter = (function () {
             var file = new Folder(file.fsName);
 
             file.changePath('EPS/' + filename + '.eps');
-            doc.saveAs(file, options);
+            return doc.saveAs(file, options);
         }
     };
 
