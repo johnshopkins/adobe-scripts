@@ -25,20 +25,25 @@ function addTo {
 }
 
 function combine {
-    # echo "Should we combine $1?"
 
-    case "$1" in
+    FILENAME=$(echo "$1" | tr '[A-Z]' '[a-z]')
+
+    case "$FILENAME" in
 
         *"sheridan"*)
-            echo "Yes, combine $1"
-            addTo "$1" "sheridan" ;;
+            echo "Yes, combine $FILENAME"
+            addTo "$FILENAME" "sheridan" ;;
+
+        "libraries")
+            echo "Yes combine $FILENAME"
+            addTo "$FILENAME" "sheridan" ;;
 
         *"peabody"*)
-            echo "Yes, combine on $1"
-            addTo "$1" "peabody" ;;
+            echo "Yes, combine on $FILENAME"
+            addTo "$FILENAME" "peabody" ;;
 
         *)
-            echo "Do not combine $1" ;;
+            echo "Do not combine $FILENAME" ;;
     
     esac
 
@@ -71,8 +76,8 @@ ls | grep zip$ | xargs rm
 
 for p in $(ls)
 do
-    echo "Rename/combine -> $p"
-    rename_files "$PACKSDIR/$p"
+    echo "Combining -> $p"
+    # rename_files "$PACKSDIR/$p"
     combine "$p"
 done
 

@@ -63,10 +63,10 @@ $.global.Exporter = (function () {
                 horizontalScale: master.scalingFactor,
                 verticalScale: master.scalingFactor
             });
-            var file = new Folder(file.fsName);
+            var png = new Folder(file.fsName);
 
-            file.changePath('PNG/' + filename + '.png');
-            return doc.exportFile(file, ExportType.PNG24, options);
+            png.changePath('PNG/' + filename + '.png');
+            return doc.exportFile(png, ExportType.PNG24, options);
         },
         saveJPG: function (file, filename) {
             var JPGMatte = _.extend(new RGBColor(), {
@@ -83,10 +83,10 @@ $.global.Exporter = (function () {
                 verticalScale: master.scalingFactor,
                 qualitySetting: 100
             });
-            var file = new Folder(file.fsName);
+            var jpg = new Folder(file.fsName);
 
-            file.changePath('JPG/' + filename + '.jpg');
-            return doc.exportFile(file, ExportType.JPEG, options);
+            jpg.changePath('JPG/' + filename + '.jpg');
+            return doc.exportFile(jpg, ExportType.JPEG, options);
         },
         savePDF: function (file, artboardNumber, filename) {
             var options = _.extend(new PDFSaveOptions(), {
@@ -97,25 +97,34 @@ $.global.Exporter = (function () {
                 generateThumbnails: false,
                 preserveEditability: false
             });
-            var file = new Folder(file.fsName);
+            var pdf = new Folder(file.fsName);
 
             // save as PDF
-            file.changePath('PDF/' + filename + '.pdf');
-            return doc.saveAs(file, options);
+            pdf.changePath('PDF/' + filename + '.pdf');
+            return doc.saveAs(pdf, options);
         },
         saveEPS: function (file, artboardNumber, filename) {
             var options = _.extend(new EPSSaveOptions(), {
-                artboardRange: artboardNumber,
                 compatibility: Compatibility.ILLUSTRATOR16,
                 embedLinkedFiles: true,
                 embedAllFonts: true,
                 includeDocumentThumbnails: false,
-                saveMultipleArtboards: true
+                saveMultipleArtboards: false
             });
-            var file = new Folder(file.fsName);
+            var eps = new Folder(file.fsName);
+            // Open the previously created pdf
+            var pdf = File(file.fsName + "/PDF/" + filename + ".pdf");
+            
+            if (!pdf.exists) {
+                throw new Error(52, "The EPS file creation process requires that the corresponding PDF exists, and there was an error finding " + pdf);
+            }   
 
-            file.changePath('EPS/' + filename + '.eps');
-            return doc.saveAs(file, options);
+            var pdfDoc = app.open(pdf);
+
+            eps.changePath('EPS/' + filename + '.eps');
+            
+            pdfDoc.saveAs(eps, options);
+            pdfDoc.close();
         }
     };
 
