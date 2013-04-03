@@ -58,12 +58,12 @@ Libraries.include("Exporter");
     });
 
     // Loop through each artboard
-    for(i = 0; i < doc.artboards.length; i++) {
+    _.each(doc.artboards, function (a, i))
 
-        currentArtboard = doc.artboards[i];
-        attributes = currentArtboard.name.split(":").map(Exporter.processAttributes);
+        attributes = a.name.split(":").map(Exporter.processAttributes);
 
         artboard = {
+            object: a,
             index: i,
             number: i + 1,
             name: currentArtboard.name,
@@ -84,12 +84,12 @@ Libraries.include("Exporter");
         // each time, so this works better and faster.
 
         // Loop through each layer
-        for(j = 0; j < doc.layers.length; j++) {
+        _.each(doc.layers, function (l, j) {
 
-            currentLayer = doc.layers[j];
-            attributes = currentLayer.name.split(".").map(Exporter.processAttributes);
+            attributes = l.name.split(".").map(Exporter.processAttributes);
 
             layer = {
+                object: l,
                 index: j,
                 name: currentLayer.name,
                 division: attributes[0],
@@ -101,7 +101,7 @@ Libraries.include("Exporter");
             if (Exporter.artboardLayerMatch(artboard, layer)) {
 
                 Exporter.hideLayers(doc.layers);
-                currentLayer.visible = true;
+                layer.object.visible = true;
 
                 fpath = Exporter.resetAllPacksPath([artboard.division, layer.sizeFormat]);
 
@@ -118,7 +118,7 @@ Libraries.include("Exporter");
                 }
         
             }
-        }
+        });
 
     }
 
