@@ -51,14 +51,17 @@ Libraries.include("Exporter");
     var layer;
     var fpath;
 
+    var filter = prompt("Filter by division?\nLeave blank to export all.").toLowerCase().trim();
+    if (typeof filter === "string" && filter === "undefined") {
+        filter = undefined;
+    }
+
     timer.start = (new Date).getTime();
 
-    Exporter.init(doc, {
-        scalingFactor: 500
-    });
+    Exporter.init(doc, {});
 
     // Loop through each artboard
-    _.each(doc.artboards, function (a, i))
+    _.each(doc.artboards, function (a, i) {
 
         attributes = a.name.split(":").map(Exporter.processAttributes);
 
@@ -66,13 +69,17 @@ Libraries.include("Exporter");
             object: a,
             index: i,
             number: i + 1,
-            name: currentArtboard.name,
+            name: a.name,
             division: attributes[0],
             sizeFormat: attributes[1],
             orientation: attributes[2]
         };
 
-        Exporter.packSetup(artboard.division);
+        if (filter && artboard.division !== filter) {
+            return;
+        }
+
+        Exporter.packSetup(artboard.division, "logo");
         doc.artboards.setActiveArtboardIndex(artboard.index);
         
         // Convert all TextFrame objects in the document to outlines
@@ -91,7 +98,7 @@ Libraries.include("Exporter");
             layer = {
                 object: l,
                 index: j,
-                name: currentLayer.name,
+                name: l.name.replace(/^([^.]+)\./, "$1.logo."),
                 division: attributes[0],
                 sizeFormat: attributes[1],
                 orientation: attributes[2],
@@ -103,7 +110,7 @@ Libraries.include("Exporter");
                 Exporter.hideLayers(doc.layers);
                 layer.object.visible = true;
 
-                fpath = Exporter.resetAllPacksPath([artboard.division, layer.sizeFormat]);
+                fpath = Exporter.resetAllPacksPath([artboard.division, "logo", layer.sizeFormat]);
 
                 Exporter.savePNG(fpath, layer.name);
                 if (layer.color !== "white") { Exporter.saveJPG(fpath, layer.name); }
@@ -118,14 +125,15 @@ Libraries.include("Exporter");
                 }
         
             }
+
         });
 
-    }
+    });
 
     timer.end = (new Date).getTime();
     timer.duration = timer.end - timer.start;
 
-    alert("Congratulations! You created " + count + " logo files in " + timer.duration / 1000 + " seconds!");
+    alert("Congratulations! You created " + count + " logo files in " + (timer.duration / 1000 / 60) + " minutes!");
 
     doc.close(SaveOptions.DONOTSAVECHANGES);
 
