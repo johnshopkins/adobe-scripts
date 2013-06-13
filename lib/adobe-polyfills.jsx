@@ -13,7 +13,7 @@ Folder.prototype.insert = function (name) {
 Array.prototype.map = function (callback) {
     var newList = [];
     for (i=0; i<this.length; i++) {
-        newList.push(callback(this[i]));
+        newList.push(callback(this[i], i, this));
     }
     return newList;
 };
