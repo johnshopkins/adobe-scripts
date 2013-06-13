@@ -10,7 +10,8 @@ $.global.Exporter = (function () {
 
     // master options object
     var master = {
-        packDirectory: "All Packs"
+        packDirectory: "All Packs",
+        scalingFactor: 500
     };
 
     return {
@@ -22,10 +23,11 @@ $.global.Exporter = (function () {
 
             allPacks.create();
         },
-        packSetup: function (name) {
+        packSetup: function (name, parent) {
             var pack = allPacks.insert(name);
-            var small = pack.insert("small");
-            var large = pack.insert("large");
+            var parent = pack.insert(parent);
+            var small = parent.insert("small");
+            var large = parent.insert("large");
 
             small.insert("EPS");
             small.insert("PDF");
@@ -105,7 +107,7 @@ $.global.Exporter = (function () {
         },
         saveEPS: function (file, artboardNumber, filename) {
             var options = _.extend(new EPSSaveOptions(), {
-                compatibility: Compatibility.ILLUSTRATOR16,
+                compatibility: Compatibility.ILLUSTRATOR10,
                 embedLinkedFiles: true,
                 embedAllFonts: true,
                 includeDocumentThumbnails: false,
