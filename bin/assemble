@@ -12,7 +12,8 @@ function rename_files {
             rename_files "$1/$f"
         done
     else 
-        RENAME=$(echo $1 | sed 's/_[^\.]*\.eps$/.eps/')
+        RENAME=$(echo $1 | sed 's/\./.logo./')
+        echo "Renaming $1 to $RENAME"
         mv "$1" "$RENAME"
     fi
 }
@@ -31,26 +32,56 @@ function combine {
     case "$FILENAME" in
 
         *"sheridan"*)
-            echo "Yes, combine $FILENAME"
+            echo "Combining $FILENAME into sheridan pack"
             addTo "$FILENAME" "sheridan" ;;
 
         "libraries")
-            echo "Yes combine $FILENAME"
+            echo "Combining $FILENAME into sheridan pack"
             addTo "$FILENAME" "sheridan" ;;
 
         *"peabody"*)
-            echo "Yes, combine on $FILENAME"
+            echo "Combining $FILENAME into peabody pack"
             addTo "$FILENAME" "peabody" ;;
 
         *)
-            echo "Do not combine $FILENAME" ;;
+            echo "Nothing to combine for $FILENAME" ;;
     
     esac
 
 }
 
+function checkForShield {
+    if [ "$1" == "university" ]; then exit 0; fi
+    if [ ! -d "$1/shield" ] || [ -f "$1/shield/small/PNG/university.shield.small.blue.png" ]
+    then
+        # No shield folder or the shield folder contains university shields, 
+        # so copy over the university shield files
+        echo "Copying university shield files into the $1 pack"
+        cp -R "university/shield" "$1"
+    fi
+}
+
+function addInFiles {
+    FILEDIR="../Resources"
+    if [ ! -d "$FILEDIR" ]
+    then
+        echo "File directory ($FILEDIR) not found."
+        exit 0
+    fi
+
+    SAVEIFS=$IFS
+    IFS=$(echo -en "\n\b")
+    #FILES="$FILEDIR"/*
+    for f in "$FILEDIR"/*
+    do
+        echo "Copying $f into the $1 pack"
+        cp -Rf "$FILEDIR/$f" "$1"
+    done
+    IFS=$SAVEIFS
+}
+
 # Default directory for packs
-DIR="~/jhuidentity"
+DIR="$(pwd)"
 
 # If a directory was passed as the first arg, use it instead
 if [ $1 ]
@@ -76,13 +107,14 @@ ls | grep zip$ | xargs rm
 
 for p in $(ls)
 do
-    echo "Combining -> $p"
-    # rename_files "$PACKSDIR/$p"
-    combine "$p"
-done
+    #rename_files "$p/logo"
 
-for p in $(ls)
-do
+    combine "$p"
+
+    checkForShield "$p"
+
+    addInFiles "$p"
+
     echo "Zipping up -> $p"
     zip -r "$p.zip" "$p"
 done
