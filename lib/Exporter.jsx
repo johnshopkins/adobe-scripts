@@ -54,7 +54,7 @@ $.global.Exporter = (function () {
             });
         },
         processAttributes: function (item) {
-            return item.toLowerCase().trim().replace(" ", "-");
+            return item.toLowerCase().trim().replace(/\s+/g, "-");
         },
         savePNG: function (file, filename) {
             var options = _.extend(new ExportOptionsPNG24(), {
