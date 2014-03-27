@@ -3,6 +3,12 @@
  * all of our custom export methods)
  */
 
+function unlockAllLayers(document) {
+    _.each(document.layers, function (layer, i) {
+        layer.locked = false;
+    });
+}
+
 $.global.Exporter = (function () {
     var doc;
     var absPath;
@@ -22,6 +28,7 @@ $.global.Exporter = (function () {
             allPacks = new Folder(absPath);
 
             allPacks.create();
+            unlockAllLayers(document);
         },
         packSetup: function (name, parent) {
             var pack = allPacks.insert(name);
