@@ -7,6 +7,11 @@ function addTo {
     mv "$PACKSDIR/$1" "$PACKSDIR/$2"
 }
 
+# NOTE: This function should be totally rewritten to explicitly
+# package up the files that need to be packaged. Then this
+# function can run LAST instead of FIRST, and it can delete
+# the package folder, and reassmble. ie delete 'sheridan', then
+# move 'sheridan-*' folders into a new folder called 'sheridan'
 function combine {
 
     FILENAME=$(echo "$1" | tr '[A-Z]' '[a-z]')
