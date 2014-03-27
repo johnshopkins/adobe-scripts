@@ -44,22 +44,25 @@ function checkForShield {
 }
 
 function addInFiles {
-    FILEDIR="../Resources"
-    if [ ! -d "$FILEDIR" ]
+    echo "Adding resource files to $1"
+    MASTER_RESOURCE_DIR="../Resources"
+    if [ ! -d "$MASTER_RESOURCE_DIR" ]
     then
-        echo "File directory ($FILEDIR) not found."
+        echo "File directory ($MASTER_RESOURCE_DIR) not found."
         exit 0
     fi
 
-    SAVEIFS=$IFS
-    IFS=$(echo -en "\n\b")
-    #FILES="$FILEDIR"/*
-    for f in "$FILEDIR"/*
-    do
-        echo "Copying $f into the $1 pack"
-        cp -Rf "$FILEDIR/$f" "$1"
-    done
-    IFS=$SAVEIFS
+    PACK_DIR="$(pwd)/$1"
+    PACK_RESOURCE_DIR="$PACK_DIR/resources"
+
+    # TO DO LATER: MUST DELETE ALL OLD RESOURCES FIRST
+    # BUT MAKE IT ABLE TO DELETE DIRECTORIES THAT ARE
+    # RESOURCE DIRS... NEED TO THINK ABOUT THIS
+    # rm "$PACK_DIR"/* > /dev/null 2>&1
+    rm -rf "$PACK_RESOURCE_DIR"
+
+    mkdir "$PACK_RESOURCE_DIR"
+    cp -R "$MASTER_RESOURCE_DIR"/* "$PACK_RESOURCE_DIR"
 }
 
 # Default directory for packs
