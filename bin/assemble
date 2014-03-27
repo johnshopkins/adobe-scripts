@@ -33,7 +33,7 @@ function combine {
 }
 
 function checkForShield {
-    if [ "$1" == "university" ]; then exit 0; fi
+    if [ "$1" == "university" ]; then return; fi
     if [ ! -d "$1/shield" ] || [ -f "$1/shield/small/PNG/university.shield.small.blue.png" ]
     then
         # No shield folder or the shield folder contains university shields, 
