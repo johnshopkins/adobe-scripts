@@ -1,23 +1,5 @@
 #!/bin/sh
 
-function rename_files {
-    # echo "Renaming $1"
-
-    if [ -d "$1" ]
-    then
-        IFS=$'\n'
-        FILES=$(ls "$1" | tr ";" "\n")
-        for f in $FILES
-        do
-            rename_files "$1/$f"
-        done
-    else 
-        RENAME=$(echo $1 | sed 's/\./.logo./')
-        echo "Renaming $1 to $RENAME"
-        mv "$1" "$RENAME"
-    fi
-}
-
 # $1: old directory name
 # $2: new directory to move into
 function addTo {
@@ -107,8 +89,6 @@ ls | grep zip$ | xargs rm
 
 for p in $(ls)
 do
-    #rename_files "$p/logo"
-
     combine "$p"
 
     checkForShield "$p"
