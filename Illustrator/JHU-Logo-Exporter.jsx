@@ -51,7 +51,7 @@ Libraries.include("Exporter");
     var layer;
     var fpath;
 
-    var filter = prompt("Filter by division?\nLeave blank to export all.").toLowerCase().trim();
+    var filter = prompt("Filter by division?\n(e.g. peabody-conservatory -- leave blank to export all)").toLowerCase().trim();
     if (typeof filter === "string" && filter === "undefined") {
         filter = undefined;
     }
