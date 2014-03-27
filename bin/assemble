@@ -13,7 +13,7 @@ function combine {
 
     case "$FILENAME" in
 
-        *"sheridan"*)
+        *"sheridan-"*)
             echo "Combining $FILENAME into sheridan pack"
             addTo "$FILENAME" "sheridan" ;;
 
@@ -21,7 +21,7 @@ function combine {
             echo "Combining $FILENAME into sheridan pack"
             addTo "$FILENAME" "sheridan" ;;
 
-        *"peabody"*)
+        *"peabody-"*)
             echo "Combining $FILENAME into peabody pack"
             addTo "$FILENAME" "peabody" ;;
 
