@@ -65,14 +65,20 @@ function addInFiles {
     cp -R "$MASTER_RESOURCE_DIR"/* "$PACK_RESOURCE_DIR"
 }
 
+
+############################
+# Begin script execution
+############################
+
 # Default directory for packs
 DIR="$(pwd)"
 
 # If a directory was passed as the first arg, use it instead
-if [ $1 ]
+if [ $# -eq 1 ]
 then
-    DIR=$(cd $1; pwd)
+    DIR=$1
 fi
+
 
 PACKSDIR="$DIR/All Packs"
 
@@ -90,14 +96,23 @@ cd "$PACKSDIR"
 # Remove existing zip files
 ls | grep zip$ | xargs rm
 
+# Loop through exported directories and combine multi packs like Peabody, Libraries
 for p in $(ls)
 do
     combine "$p"
+done
 
+# Loop through combined directories and add University shield where needed, 
+# then add in resources from ../Resources
+for p in $(ls)
+do
     checkForShield "$p"
-
     addInFiles "$p"
+done
 
+# Loop through final set of directories and zip each one
+for p in $(ls)
+do
     echo "Zipping up -> $p"
     zip -r "$p.zip" "$p"
 done
