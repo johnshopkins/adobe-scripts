@@ -7,8 +7,14 @@ function addTo {
     mv "$PACKSDIR/$1" "$PACKSDIR/$2"
 }
 
+# Destroy and recreate a directory, leaving it empty
+function clearDir {
+    DIR="$1"
 
+    rm -rf "$DIR" > /dev/null 2>&1
+    mkdir -p "$DIR"
 }
+
 
 function checkForShield {
     if [ "$1" == "university" ]; then return; fi
