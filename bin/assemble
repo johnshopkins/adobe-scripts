@@ -7,33 +7,6 @@ function addTo {
     mv "$PACKSDIR/$1" "$PACKSDIR/$2"
 }
 
-# NOTE: This function should be totally rewritten to explicitly
-# package up the files that need to be packaged. Then this
-# function can run LAST instead of FIRST, and it can delete
-# the package folder, and reassmble. ie delete 'sheridan', then
-# move 'sheridan-*' folders into a new folder called 'sheridan'
-function combine {
-
-    FILENAME=$(echo "$1" | tr '[A-Z]' '[a-z]')
-
-    case "$FILENAME" in
-
-        *"sheridan-"*)
-            echo "Combining $FILENAME into sheridan pack"
-            addTo "$FILENAME" "sheridan" ;;
-
-        "libraries")
-            echo "Combining $FILENAME into sheridan pack"
-            addTo "$FILENAME" "sheridan" ;;
-
-        *"peabody-"*)
-            echo "Combining $FILENAME into peabody pack"
-            addTo "$FILENAME" "peabody" ;;
-
-        *)
-            echo "Nothing to combine for $FILENAME" ;;
-    
-    esac
 
 }
 
@@ -102,10 +75,10 @@ cd "$PACKSDIR"
 ls | grep zip$ | xargs rm
 
 # Loop through exported directories and combine multi packs like Peabody, Libraries
-for p in $(ls)
-do
-    combine "$p"
-done
+# for p in $(ls)
+# do
+#     combine "$p"
+# done
 
 # Loop through combined directories and add University shield where needed, 
 # then add in resources from ../Resources
