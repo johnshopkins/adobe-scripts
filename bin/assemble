@@ -49,6 +49,14 @@ function addInFiles {
     cp -R "$MASTER_RESOURCE_DIR"/* "$PACK_RESOURCE_DIR"
 }
 
+# Hard-coded function to remove unnecessary shields
+function pruneShields {
+    PACKSDIR="$1"
+
+    rm -rf "$PACKSDIR"/enterprise-health/shield
+    rm -rf "$PACKSDIR"/enterprise-medicine/shield
+}
+
 
 ############################
 # Begin script execution
@@ -93,6 +101,9 @@ do
     checkForShield "$p"
     addInFiles "$p"
 done
+
+# Get rid of unnecessary shields (hard-coded)
+pruneShields "$PACKSDIR"
 
 # Loop through final set of directories and zip each one
 for p in $(ls)
