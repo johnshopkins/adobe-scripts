@@ -7,35 +7,14 @@ function addTo {
     mv "$PACKSDIR/$1" "$PACKSDIR/$2"
 }
 
-# NOTE: This function should be totally rewritten to explicitly
-# package up the files that need to be packaged. Then this
-# function can run LAST instead of FIRST, and it can delete
-# the package folder, and reassmble. ie delete 'sheridan', then
-# move 'sheridan-*' folders into a new folder called 'sheridan'
-function combine {
+# Destroy and recreate a directory, leaving it empty
+function clearDir {
+    DIR="$1"
 
-    FILENAME=$(echo "$1" | tr '[A-Z]' '[a-z]')
-
-    case "$FILENAME" in
-
-        *"sheridan-"*)
-            echo "Combining $FILENAME into sheridan pack"
-            addTo "$FILENAME" "sheridan" ;;
-
-        "libraries")
-            echo "Combining $FILENAME into sheridan pack"
-            addTo "$FILENAME" "sheridan" ;;
-
-        *"peabody-"*)
-            echo "Combining $FILENAME into peabody pack"
-            addTo "$FILENAME" "peabody" ;;
-
-        *)
-            echo "Nothing to combine for $FILENAME" ;;
-    
-    esac
-
+    rm -rf "$DIR" > /dev/null 2>&1
+    mkdir -p "$DIR"
 }
+
 
 function checkForShield {
     if [ "$1" == "university" ]; then return; fi
@@ -70,6 +49,45 @@ function addInFiles {
     cp -R "$MASTER_RESOURCE_DIR"/* "$PACK_RESOURCE_DIR"
 }
 
+# Hard-coded function to remove unnecessary shields
+function pruneShields {
+    PACKSDIR="$1"
+
+    rm -rf "$PACKSDIR"/enterprise-health/shield
+    rm -rf "$PACKSDIR"/enterprise-medicine/shield
+}
+
+# If $2 exists inside $1, remove $1/$2 and move 
+# into $1/$3 (make sure you make $1/$3 first)
+function combineIfExists {
+    PACKSDIR="$1"
+    NEWPACK="$2"
+    COMBO="$3"
+
+    mkdir -p "$PACKSDIR"/"$COMBO"
+
+    if [ -d "$PACKSDIR"/"$NEWPACK" ]; then
+        echo "Combining $NEWPACK into $COMBO folder"
+        rm -rf "$PACKSDIR"/"$COMBO"/"$NEWPACK" > /dev/null 2>&1
+        mv -f "$PACKSDIR"/"$NEWPACK" "$PACKSDIR"/"$COMBO"/
+    fi
+}
+
+# Move and combine combo packs by hand
+function combine {
+    
+    PACKSDIR="$1"
+    
+    combineIfExists "$PACKSDIR" "peabody-conservatory"  "peabody"
+    combineIfExists "$PACKSDIR" "peabody-institute"     "peabody"
+    combineIfExists "$PACKSDIR" "peabody-preparatory"   "peabody"
+
+    combineIfExists "$PACKSDIR" "libraries"             "sheridan"
+    combineIfExists "$PACKSDIR" "sheridan-libraries"    "sheridan"
+    combineIfExists "$PACKSDIR" "sheridan-museums"      "sheridan"
+
+}
+
 
 ############################
 # Begin script execution
@@ -102,10 +120,10 @@ cd "$PACKSDIR"
 ls | grep zip$ | xargs rm
 
 # Loop through exported directories and combine multi packs like Peabody, Libraries
-for p in $(ls)
-do
-    combine "$p"
-done
+# for p in $(ls)
+# do
+#     combine "$p"
+# done
 
 # Loop through combined directories and add University shield where needed, 
 # then add in resources from ../Resources
@@ -114,6 +132,12 @@ do
     checkForShield "$p"
     addInFiles "$p"
 done
+
+# Get rid of unnecessary shields (hard-coded)
+pruneShields "$PACKSDIR"
+
+# Combine custom packs (hard-coded)
+combine "$PACKSDIR"
 
 # Loop through final set of directories and zip each one
 for p in $(ls)
