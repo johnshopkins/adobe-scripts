@@ -8,7 +8,7 @@ var Libraries=function(a){return{include:function(b){return b.match(/\.jsx$/i)||
 
 /*
 * Name: "JHU-Logo-Exporter.jsx
-* 
+*
 * Description: An Adobe Illustrator CS6 script to auto export files
 * first by artboard and then by name-matched layer.
 *
@@ -16,8 +16,8 @@ var Libraries=function(a){return{include:function(b){return b.match(/\.jsx$/i)||
 
 
 /**
- * Adobe JS Polyfills 
- * 
+ * Adobe JS Polyfills
+ *
  * Could be moved to a separate file if we could figure
  * out how to include other script files
  */
@@ -86,7 +86,7 @@ Libraries.include("Exporter");
         //Note: Adobe script uses proper y-coordinate values (moving up is positive, moving down is negative).
         //      This is different from the way the interface deals with y-coordinate values, where moving
         //      down is associated with increasing the y-coordinate value.
-        //      This is unnecessarily stupid. 
+        //      This is unnecessarily stupid.
         a.artboardRect = artboard.rect.map(function (coordinate, i) {
             if (i == 0 || i == 3) {
                 return Math.floor(coordinate) - 1;
@@ -98,13 +98,14 @@ Libraries.include("Exporter");
 
         Exporter.packSetup(artboard.division, "shield");
         doc.artboards.setActiveArtboardIndex(artboard.index);
-        
+
         fpath = Exporter.resetAllPacksPath([artboard.division, "shield", artboard.sizeFormat]);
 
         Exporter.savePNG(fpath, artboard.fileName);
         if (artboard.color !== "white") { Exporter.saveJPG(fpath, artboard.fileName); }
         Exporter.savePDF(fpath, artboard.number, artboard.fileName);
         Exporter.saveEPS(fpath, artboard.number, artboard.fileName);
+        Exporter.saveSVG(fpath, artboard.fileName);
 
         // Increment the counter in a superhackalicious way
         if (artboard.color === "white") {
@@ -123,5 +124,3 @@ Libraries.include("Exporter");
     doc.close(SaveOptions.DONOTSAVECHANGES);
 
 })(app);
-
-

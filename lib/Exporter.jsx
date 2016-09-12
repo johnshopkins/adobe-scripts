@@ -38,11 +38,13 @@ $.global.Exporter = (function () {
 
             small.insert("EPS");
             small.insert("PDF");
+            small.insert("SVG");
             small.insert("JPG");
             small.insert("PNG");
 
             large.insert("EPS");
             large.insert("PDF");
+            large.insert("SVG");
         },
         resetAllPacksPath: function (directories) {
             var path = new Folder(absPath);
@@ -123,16 +125,33 @@ $.global.Exporter = (function () {
             var eps = new Folder(file.fsName);
             // Open the previously created pdf
             var pdf = File(file.fsName + "/PDF/" + filename + ".pdf");
-            
+
             if (!pdf.exists) {
                 throw new Error(52, "The EPS file creation process requires that the corresponding PDF exists, and there was an error finding " + pdf);
-            }   
+            }
 
             var pdfDoc = app.open(pdf);
 
             eps.changePath('EPS/' + filename + '.eps');
-            
+
             pdfDoc.saveAs(eps, options);
+            pdfDoc.close();
+        },
+        saveSVG: function (file, filename) {
+            var options = _.extend(new ExportOptionsSVG(), {});
+
+            var svg = new Folder(file.fsName);
+            svg.changePath('SVG/' + filename + '.svg');
+            // Open the previously created pdf
+            var pdf = File(file.fsName + "/PDF/" + filename + ".pdf");
+
+            if (!pdf.exists) {
+                throw new Error(52, "The SVG file creation process requires that the corresponding PDF exists, and there was an error finding " + pdf);
+            }
+
+            var pdfDoc = app.open(pdf);
+
+            pdfDoc.exportFile(svg, ExportType.SVG, options);
             pdfDoc.close();
         }
     };

@@ -8,7 +8,7 @@ var Libraries=function(a){return{include:function(b){return b.match(/\.jsx$/i)||
 
 /*
 * Name: "JHU-Logo-Exporter.jsx
-* 
+*
 * Description: An Adobe Illustrator CS6 script to auto export files
 * first by artboard and then by name-matched layer.
 *
@@ -16,8 +16,8 @@ var Libraries=function(a){return{include:function(b){return b.match(/\.jsx$/i)||
 
 
 /**
- * Adobe JS Polyfills 
- * 
+ * Adobe JS Polyfills
+ *
  * Could be moved to a separate file if we could figure
  * out how to include other script files
  */
@@ -81,7 +81,7 @@ Libraries.include("Exporter");
 
         Exporter.packSetup(artboard.division, "logo");
         doc.artboards.setActiveArtboardIndex(artboard.index);
-        
+
         // Convert all TextFrame objects in the document to outlines
         while (doc.textFrames.length > 0) {
             doc.textFrames[0].createOutline();
@@ -116,6 +116,7 @@ Libraries.include("Exporter");
                 if (layer.color !== "white") { Exporter.saveJPG(fpath, layer.name); }
                 Exporter.savePDF(fpath, artboard.number, layer.name);
                 Exporter.saveEPS(fpath, artboard.number, layer.name);
+                Exporter.saveSVG(fpath, layer.name);
 
                 // Increment the counter in a superhackalicious way
                 if (layer.color === "white") {
@@ -123,7 +124,7 @@ Libraries.include("Exporter");
                 } else {
                     count += layer.sizeFormat === "small" ? 4 : 2;
                 }
-        
+
             }
 
         });
@@ -138,5 +139,3 @@ Libraries.include("Exporter");
     doc.close(SaveOptions.DONOTSAVECHANGES);
 
 })(app);
-
-
