@@ -66,7 +66,7 @@ $.global.Exporter = (function () {
         },
         savePNG: function (file, filename) {
             var directory = Folder(file.fsName + "/PNG");
-            if (!directory.exists) { return; }
+            if (!directory.exists) { return false; }
 
             var options = _.extend(new ExportOptionsPNG24(), {
                 transparency: true,
@@ -79,11 +79,12 @@ $.global.Exporter = (function () {
             var png = new Folder(file.fsName);
 
             png.changePath('PNG/' + filename + '.png');
-            return doc.exportFile(png, ExportType.PNG24, options);
+            doc.exportFile(png, ExportType.PNG24, options);
+            return png.exists;
         },
         saveJPG: function (file, filename) {
             var directory = Folder(file.fsName + "/JPG");
-            if (!directory.exists) { return; }
+            if (!directory.exists) { return false; }
 
             var JPGMatte = _.extend(new RGBColor(), {
                 red: 255,
@@ -102,11 +103,12 @@ $.global.Exporter = (function () {
             var jpg = new Folder(file.fsName);
 
             jpg.changePath('JPG/' + filename + '.jpg');
-            return doc.exportFile(jpg, ExportType.JPEG, options);
+            doc.exportFile(jpg, ExportType.JPEG, options);
+            return jpg.exists;
         },
           savePDF: function (file, artboardNumber, filename) {
             var directory = Folder(file.fsName + "/PDF");
-            if (!directory.exists) { return; }
+            if (!directory.exists) { return false; }
 
             var options = _.extend(new PDFSaveOptions(), {
                 acrobatLayers: false,
@@ -120,11 +122,12 @@ $.global.Exporter = (function () {
 
             // save as PDF
             pdf.changePath('PDF/' + filename + '.pdf');
-            return doc.saveAs(pdf, options);
+            doc.saveAs(pdf, options);
+            return pdf.exists;
         },
         saveEPS: function (file, artboardNumber, filename) {
             var directory = Folder(file.fsName + "/EPS");
-            if (!directory.exists) { return; }
+            if (!directory.exists) { return false; }
 
             var options = _.extend(new EPSSaveOptions(), {
                 compatibility: Compatibility.ILLUSTRATOR10,
@@ -147,10 +150,11 @@ $.global.Exporter = (function () {
 
             pdfDoc.saveAs(eps, options);
             pdfDoc.close();
+            return eps.exists;
         },
         saveSVG: function (file, filename) {
             var directory = Folder(file.fsName + "/SVG");
-            if (!directory.exists) { return; }
+            if (!directory.exists) { return false; }
 
             var options = _.extend(new ExportOptionsSVG(), {});
             var svg = new Folder(file.fsName);
@@ -166,6 +170,7 @@ $.global.Exporter = (function () {
 
             pdfDoc.exportFile(svg, ExportType.SVG, options);
             pdfDoc.close();
+            return svg.exists;
         }
     };
 

@@ -112,18 +112,20 @@ Libraries.include("Exporter");
 
                 fpath = Exporter.resetAllPacksPath([artboard.division, "logo", layer.sizeFormat]);
 
-                Exporter.savePNG(fpath, layer.name);
-                if (layer.color !== "white") { Exporter.saveJPG(fpath, layer.name); }
-                Exporter.savePDF(fpath, artboard.number, layer.name);
-                Exporter.saveEPS(fpath, artboard.number, layer.name);
-                Exporter.saveSVG(fpath, layer.name);
+                if (layer.color !== "white") {
+                  if (Exporter.saveJPG(fpath, layer.name)) { count++; }
+                }
+                if (Exporter.savePNG(fpath, layer.name)) { count++; }
+                if (Exporter.savePDF(fpath, artboard.number, layer.name)) { count++; }
+                if (Exporter.saveEPS(fpath, artboard.number, layer.name)) { count++; }
+                if (Exporter.saveSVG(fpath, layer.name)) { count++; }
 
                 // Increment the counter in a superhackalicious way
-                if (layer.color === "white") {
-                    count += layer.sizeFormat === "small" ? 3 : 2;
-                } else {
-                    count += layer.sizeFormat === "small" ? 4 : 2;
-                }
+                // if (layer.color === "white") {
+                //     count += layer.sizeFormat === "small" ? 3 : 2;
+                // } else {
+                //     count += layer.sizeFormat === "small" ? 4 : 2;
+                // }
 
             }
 
