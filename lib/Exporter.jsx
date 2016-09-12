@@ -44,7 +44,6 @@ $.global.Exporter = (function () {
 
             large.insert("EPS");
             large.insert("PDF");
-            large.insert("SVG");
         },
         resetAllPacksPath: function (directories) {
             var path = new Folder(absPath);
@@ -66,6 +65,9 @@ $.global.Exporter = (function () {
             return item.toLowerCase().trim().replace(/\s+/g, "-");
         },
         savePNG: function (file, filename) {
+            var directory = Folder(file.fsName + "/PNG");
+            if (!directory.exists) { return; }
+
             var options = _.extend(new ExportOptionsPNG24(), {
                 transparency: true,
                 artBoardClipping: true,
@@ -80,6 +82,9 @@ $.global.Exporter = (function () {
             return doc.exportFile(png, ExportType.PNG24, options);
         },
         saveJPG: function (file, filename) {
+            var directory = Folder(file.fsName + "/JPG");
+            if (!directory.exists) { return; }
+
             var JPGMatte = _.extend(new RGBColor(), {
                 red: 255,
                 green: 255,
@@ -99,7 +104,10 @@ $.global.Exporter = (function () {
             jpg.changePath('JPG/' + filename + '.jpg');
             return doc.exportFile(jpg, ExportType.JPEG, options);
         },
-        savePDF: function (file, artboardNumber, filename) {
+          savePDF: function (file, artboardNumber, filename) {
+            var directory = Folder(file.fsName + "/PDF");
+            if (!directory.exists) { return; }
+
             var options = _.extend(new PDFSaveOptions(), {
                 acrobatLayers: false,
                 artboardRange: artboardNumber,
@@ -115,6 +123,9 @@ $.global.Exporter = (function () {
             return doc.saveAs(pdf, options);
         },
         saveEPS: function (file, artboardNumber, filename) {
+            var directory = Folder(file.fsName + "/EPS");
+            if (!directory.exists) { return; }
+
             var options = _.extend(new EPSSaveOptions(), {
                 compatibility: Compatibility.ILLUSTRATOR10,
                 embedLinkedFiles: true,
@@ -138,8 +149,10 @@ $.global.Exporter = (function () {
             pdfDoc.close();
         },
         saveSVG: function (file, filename) {
-            var options = _.extend(new ExportOptionsSVG(), {});
+            var directory = Folder(file.fsName + "/SVG");
+            if (!directory.exists) { return; }
 
+            var options = _.extend(new ExportOptionsSVG(), {});
             var svg = new Folder(file.fsName);
             svg.changePath('SVG/' + filename + '.svg');
             // Open the previously created pdf
